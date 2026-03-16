@@ -746,15 +746,6 @@ export default function App() {
 
         {activeTab === 2 && (
           <div className="space-y-6 pb-20">
-            {/* Header Info - Simplified */}
-            <div className="bg-gradient-to-br from-pink-500 to-rose-400 p-8 rounded-[32px] text-white shadow-lg relative overflow-hidden flex items-center justify-center">
-              <div className="relative z-10 text-center">
-                <ShoppingBag size={48} className="mx-auto mb-2 opacity-80" />
-                <div className="text-xl font-black tracking-tight">周边兑换中心</div>
-              </div>
-              <ShoppingBag className="absolute -right-4 -bottom-4 text-white/10 w-32 h-32 rotate-12" />
-            </div>
-
             {/* Gift Styles Section */}
             <div className="bg-white p-6 rounded-[32px] shadow-sm border border-pink-50">
               <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
