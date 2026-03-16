@@ -26,19 +26,27 @@ import { INITIAL_AREAS, INITIAL_TASKS, INITIAL_BACKPACK } from './constants';
 
 // --- Components ---
 
-const Header: React.FC<{ title: string; onBack?: () => void; isHome?: boolean }> = ({ title, onBack, isHome }) => (
+const Header: React.FC<{ 
+  title: string; 
+  onBack?: () => void; 
+  isHome?: boolean;
+}> = ({ title, onBack, isHome }) => (
   <header className="fixed top-0 left-0 right-0 h-14 bg-white/80 backdrop-blur-md border-b border-pink-100 flex items-center justify-between px-4 z-50">
-    <button 
-      onClick={onBack} 
-      disabled={isHome}
-      className={`p-2 rounded-full ${isHome ? 'opacity-30 cursor-not-allowed' : 'active:bg-pink-50 text-pink-500'}`}
-    >
-      <ChevronLeft size={24} />
-    </button>
-    <h1 className="text-lg font-medium text-gray-800">{title}</h1>
-    <button className="p-2 rounded-full active:bg-pink-50 text-pink-500">
-      <Share2 size={20} />
-    </button>
+    <div className="flex items-center">
+      <button 
+        onClick={onBack} 
+        disabled={isHome}
+        className={`p-2 rounded-full ${isHome ? 'opacity-30 cursor-not-allowed' : 'active:bg-pink-50 text-pink-500'}`}
+      >
+        <ChevronLeft size={24} />
+      </button>
+    </div>
+    <h1 className="text-lg font-medium text-gray-800 truncate px-2">{title}</h1>
+    <div className="flex items-center gap-1">
+      <button className="p-2 rounded-full active:bg-pink-50 text-pink-500">
+        <Share2 size={20} />
+      </button>
+    </div>
   </header>
 );
 
@@ -93,6 +101,7 @@ export default function App() {
     Array.from({ length: 4 }, (_, i) => ({ id: i, unlocked: true }))
   );
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showRulesModal, setShowRulesModal] = useState(false);
   const [stageDrawCount, setStageDrawCount] = useState(0);
   const [isTaskExpanded, setIsTaskExpanded] = useState(false);
   const [unlockModal, setUnlockModal] = useState<Area | null>(null);
@@ -303,7 +312,23 @@ export default function App() {
 
       <main className="pt-16 px-4">
         {activeTab === 0 && (
-          <div className="space-y-6">
+          <div className="space-y-6 relative">
+            {!subPage && (
+              <>
+                <div className="text-center py-2 bg-pink-50/50 rounded-xl border border-pink-100">
+                  <p className="text-[10px] font-bold text-pink-500 tracking-wider">
+                    开始时间4.7 0:00-4.30 23:59（utf-8）
+                  </p>
+                </div>
+                <button 
+                  onClick={() => setShowRulesModal(true)}
+                  className="absolute -top-1 right-0 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm border border-pink-100 text-pink-500 flex items-center gap-1 active:scale-95 transition-all z-20"
+                >
+                  <AlertCircle size={16} />
+                  <span className="text-[10px] font-bold">规则</span>
+                </button>
+              </>
+            )}
             {!subPage ? (
               <div className="relative min-h-[80vh] py-10">
 
@@ -805,6 +830,62 @@ export default function App() {
       <Sidebar activeTab={activeTab} setActiveTab={(t) => { setActiveTab(t); setSubPage(null); }} />
 
       <AnimatePresence>
+        {showRulesModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowRulesModal(false)}
+              className="fixed inset-0 bg-black/60 z-[150] backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white rounded-[32px] z-[160] p-8 shadow-2xl overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-rose-400" />
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-black text-gray-800 flex items-center gap-2">
+                  <AlertCircle className="text-pink-500" /> 活动规则
+                </h3>
+                <button 
+                  onClick={() => setShowRulesModal(false)}
+                  className="p-2 bg-gray-100 rounded-full text-gray-400 active:scale-90 transition-transform"
+                >
+                  <Plus size={20} className="rotate-45" />
+                </button>
+              </div>
+              
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                {[
+                  { title: '活动时间', content: '2026年4月7日 0:00 至 2026年4月30日 23:59。' },
+                  { title: '参与方式', content: '用户通过完成每日任务获取 Token，这是参与活动的核心道具。' },
+                  { title: '区域解锁', content: '消耗指定数量的 Token 可解锁不同玩法区域（拍照打卡区、舞台区、食物饮品区）。' },
+                  { title: '抽奖机制', content: '在舞台区和食物饮品区可消耗 Token 进行抽奖，赢取音符碎片、鸡腿碎片及各类限定贴纸。' },
+                  { title: '周边兑换', content: '收集足够的碎片可在周边兑换中心兑换精美礼物及 Coins。' },
+                  { title: '贴纸收集', content: '特定贴纸是解锁后续高级区域的关键道具，请务必留意收集。' },
+                  { title: '注意事项', content: '所有活动道具仅限本次活动期间使用，逾期将自动失效，请及时使用。' },
+                  { title: '最终解释权', content: '本次活动的最终解释权归活动主办方所有。' },
+                ].map((rule, idx) => (
+                  <div key={idx} className="bg-pink-50/30 p-4 rounded-2xl border border-pink-100/50">
+                    <h4 className="text-sm font-black text-pink-600 mb-1">{rule.title}</h4>
+                    <p className="text-xs text-gray-600 leading-relaxed">{rule.content}</p>
+                  </div>
+                ))}
+              </div>
+
+              <button 
+                onClick={() => setShowRulesModal(false)}
+                className="w-full mt-8 py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black rounded-2xl shadow-lg shadow-pink-200 active:scale-[0.98] transition-transform"
+              >
+                我知道了
+              </button>
+            </motion.div>
+          </>
+        )}
+
         {showShareModal && (
           <>
             <motion.div
